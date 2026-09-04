@@ -8,9 +8,9 @@ Tested against Mattermost **10.12.4**.
 
 ## Scripts
 
-| Script | Input | Output |
-|---|---|---|
-| `export.py` | Mattermost REST API | `channel_export.json` |
+| Script       | Input                 | Output                 |
+| ------------ | --------------------- | ---------------------- |
+| `export.py`  | Mattermost REST API   | `channel_export.json`  |
 | `to_html.py` | `channel_export.json` | `channel_archive.html` |
 
 ---
@@ -29,14 +29,25 @@ Fetches the full history of a channel via the Mattermost API and writes a clean 
 
 ### Environment variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `MM_URL` | Yes | Base URL of your instance, e.g. `https://mattermost.example.com` |
-| `MM_TOKEN` | Yes | Personal access token (Account Settings → Security → Personal Access Tokens) |
-| `MM_CHANNEL_ID` | Yes | ID of the channel to export |
-| `MM_OUTPUT` | No | Output file path (default: `channel_export.json`) |
+| Variable        | Required | Description                                                                                              |
+| --------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `MM_URL`        | Yes      | Base URL of your instance, e.g. `https://mattermost.example.com`                                         |
+| `MM_TOKEN`      | Yes      | Personal access token (Account Settings → Security → Personal Access Tokens)                             |
+| `MM_CHANNEL_ID` | Yes      | ID of the channel(s) to export. Comma-separated for multiple channels, e.g. `abc123,def456`              |
+| `MM_OUTPUT_DIR` | No       | Directory where the output files are written (default: current directory)                                |
+| `MM_COOKIE`     | No       | Cookie header to send with every request, needed when the instance sits behind an auth proxy (see below) |
 
 **Finding the channel ID:** in the Mattermost web or desktop app, open the channel → **View Info** — the ID is displayed at the bottom, or visible in the URL.
+
+### Cookie-based authentication (`MM_COOKIE`)
+
+If the Mattermost instance is behind `oauth2-proxy`, a personal access token alone may not be enough to get past the proxy. In that case, grab the `_oauth2_proxy` cookie value from your browser's dev tools (Application/Storage → Cookies) after logging in, and export it:
+
+```bash
+export MM_COOKIE="_oauth2_proxy=XXXX"
+```
+
+`MM_COOKIE` accepts a standard `key=value; key2=value2` cookie string, so you can pass additional cookies alongside `_oauth2_proxy` if needed.
 
 ### Usage
 
@@ -44,7 +55,16 @@ Fetches the full history of a channel via the Mattermost API and writes a clean 
 export MM_URL="https://mattermost.example.com"
 export MM_TOKEN="your-personal-access-token"
 export MM_CHANNEL_ID="abc123def456"
+# Optional: only needed behind an oauth2-proxy
+export MM_COOKIE="_oauth2_proxy=XXXX"
 
+python export.py
+```
+
+To export several channels in one run, pass multiple comma-separated IDs — one output file is written per channel:
+
+```bash
+export MM_CHANNEL_ID="abc123def456,ghi789jkl012"
 python export.py
 ```
 
@@ -91,16 +111,19 @@ python export.py
         { "emoji": "thumbsup", "count": 3, "users": ["bob", "carol", "dave"] }
       ],
       "files": [
-        { "id": "...", "name": "report.pdf", "mime_type": "application/pdf", "size": 48320 }
+        {
+          "id": "...",
+          "name": "report.pdf",
+          "mime_type": "application/pdf",
+          "size": 48320
+        }
       ],
-      "links": [
-        { "type": "opengraph", "url": "https://...", "title": "..." }
-      ],
+      "links": [{ "type": "opengraph", "url": "https://...", "title": "..." }],
       "thread": [
         {
           "id": "...",
           "created_at": "...",
-          "user": { "username": "bob", "..." : "..." },
+          "user": { "username": "bob", "...": "..." },
           "message": "Great!",
           "reactions": [],
           "files": [],
@@ -152,6 +175,7 @@ python to_html.py
 export MM_URL="https://mattermost.example.com"
 export MM_TOKEN="your-token"
 export MM_CHANNEL_ID="your-channel-id"
+# export MM_COOKIE="_oauth2_proxy=XXXX"  # only if behind oauth2-proxy
 python export.py
 
 # 2. Render

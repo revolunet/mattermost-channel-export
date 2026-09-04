@@ -8,16 +8,18 @@ Usage:
 Required environment variables:
     MM_URL          Base URL of your Mattermost instance (e.g. https://mattermost.example.com)
     MM_TOKEN        Personal access token or session token
-    MM_CHANNEL_ID   Channel ID to export
+    MM_CHANNEL_ID   Channel ID(s) to export, comma-separated for multiple channels
 
 Optional:
-    MM_OUTPUT       Output file path (default: channel_export.json)
+    MM_OUTPUT_DIR   Directory where output files are written (default: current directory)
 """
 
 import json
 import os
+import re
 import sys
 import time
+import unicodedata
 from datetime import datetime, timezone
 from typing import Any
 
@@ -33,8 +35,9 @@ except ImportError:
 
 BASE_URL = os.environ.get("MM_URL", "").rstrip("/")
 TOKEN = os.environ.get("MM_TOKEN", "")
-CHANNEL_ID = os.environ.get("MM_CHANNEL_ID", "")
-OUTPUT_FILE = os.environ.get("MM_OUTPUT", "channel_export.json")
+CHANNEL_IDS = [c.strip() for c in os.environ.get("MM_CHANNEL_ID", "").split(",") if c.strip()]
+OUTPUT_DIR = os.environ.get("MM_OUTPUT_DIR", ".")
+COOKIE = os.environ.get("MM_COOKIE", "")
 
 POSTS_PER_PAGE = 200  # max allowed by Mattermost
 
@@ -48,13 +51,20 @@ if not BASE_URL:
     die("MM_URL is not set")
 if not TOKEN:
     die("MM_TOKEN is not set")
-if not CHANNEL_ID:
+if not CHANNEL_IDS:
     die("MM_CHANNEL_ID is not set")
 
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
     "Content-Type": "application/json",
 }
+
+# Optional cookies (e.g. MMAUTHTOKEN=...; other=...) sent with every request
+COOKIES = {}
+for _pair in COOKIE.split(";"):
+    if "=" in _pair:
+        _name, _value = _pair.split("=", 1)
+        COOKIES[_name.strip()] = _value.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -63,7 +73,7 @@ HEADERS = {
 
 def get(path: str, params: dict | None = None) -> Any:
     url = f"{BASE_URL}/api/v4{path}"
-    resp = requests.get(url, headers=HEADERS, params=params or {})
+    resp = requests.get(url, headers=HEADERS, cookies=COOKIES, params=params or {})
     if resp.status_code == 429:
         retry_after = int(resp.headers.get("Retry-After", 2))
         print(f"  Rate limited, waiting {retry_after}s …")
@@ -182,8 +192,13 @@ def extract_reactions(metadata: dict) -> list[dict]:
 def extract_embeds(metadata: dict) -> list[dict]:
     embeds = []
     for e in metadata.get("embeds", []) or []:
+        if not isinstance(e, dict):
+            continue
         entry: dict = {"type": e.get("type"), "url": e.get("url")}
-        og = e.get("data") or {}
+        # "data" is not always a dict (e.g. some embed types carry a plain string)
+        og = e.get("data")
+        if not isinstance(og, dict):
+            og = {}
         if og.get("title"):
             entry["title"] = og["title"]
         if og.get("description"):
@@ -257,20 +272,30 @@ def fetch_channel_info(channel_id: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Main
+# Slug helper
 # ---------------------------------------------------------------------------
 
-def main() -> None:
+def slugify(value: str) -> str:
+    value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    value = re.sub(r"[^\w\s-]", "", value).strip().lower()
+    return re.sub(r"[-\s]+", "-", value)
+
+
+# ---------------------------------------------------------------------------
+# Export a single channel
+# ---------------------------------------------------------------------------
+
+def export_channel(channel_id: str) -> None:
     print(f"Mattermost Channel Export")
     print(f"  Server  : {BASE_URL}")
-    print(f"  Channel : {CHANNEL_ID}")
+    print(f"  Channel : {channel_id}")
     print()
 
-    channel_info = fetch_channel_info(CHANNEL_ID)
+    channel_info = fetch_channel_info(channel_id)
     print(f"  Channel name : {channel_info['display_name']} (#{channel_info['name']})")
     print()
 
-    raw_posts = fetch_all_posts(CHANNEL_ID)
+    raw_posts = fetch_all_posts(channel_id)
     print(f"\nShaping {len(raw_posts)} posts …")
 
     messages = []
@@ -279,7 +304,11 @@ def main() -> None:
             print(f"  {i}/{len(raw_posts)} …")
         if raw.get("root_id"):
             continue  # thread reply — will appear nested under its parent
-        shaped = shape_post(raw)
+        try:
+            shaped = shape_post(raw)
+        except Exception as exc:
+            print(f"  Warning: could not shape post {raw.get('id')}: {exc}")
+            continue
         if shaped:
             messages.append(shaped)
 
@@ -290,10 +319,24 @@ def main() -> None:
         "messages": messages,
     }
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    slug = slugify(channel_info["display_name"] or channel_info["name"] or channel_id)
+    output_file = os.path.join(OUTPUT_DIR, f"{slug}.json")
+
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f"\nDone. {len(messages)} messages written to {OUTPUT_FILE}")
+    print(f"\nDone. {len(messages)} messages written to {output_file}")
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    for channel_id in CHANNEL_IDS:
+        export_channel(channel_id)
+        print()
 
 
 if __name__ == "__main__":
