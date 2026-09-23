@@ -1,0 +1,277 @@
+{
+  "exported_at": "2026-08-14T18:00:00+00:00",
+  "channel": {
+    "id": "chan-general-001",
+    "name": "general",
+    "display_name": "Général",
+    "type": "O",
+    "purpose": "Discussions générales de l'équipe",
+    "header": "Bienvenue sur le canal général !",
+    "team": "Équipe Exemple",
+    "created_at": "2026-01-05T08:00:00+00:00"
+  },
+  "message_count": 10,
+  "messages": [
+    {
+      "id": "m-general-01",
+      "created_at": "2026-08-10T08:02:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Bonjour à tous ! J'espère que vous avez passé un bon week-end. On attaque la semaine avec le point d'équipe à 10h.",
+      "reactions": [
+        {
+          "emoji": "wave",
+          "count": 2,
+          "users": [
+            "julien",
+            "sophie"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-02",
+      "created_at": "2026-08-10T08:05:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Salut Camille ! Oui top, on se voit tout à l'heure. J'ai mis à jour l'ordre du jour dans le pad partagé.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-03",
+      "created_at": "2026-08-10T09:40:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "**Rappel** : merci de valider vos congés de septembre avant vendredi, le service RH clôture le formulaire ce week-end.",
+      "reactions": [
+        {
+          "emoji": "thumbsup",
+          "count": 3,
+          "users": [
+            "nabil",
+            "camille",
+            "julien"
+          ]
+        }
+      ],
+      "files": [
+        {
+          "id": "f1a2b3c4",
+          "name": "formulaire-conges.pdf",
+          "mime_type": "application/pdf",
+          "size": 128400
+        }
+      ],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-04",
+      "created_at": "2026-08-10T09:42:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Merci pour le rappel, je le fais tout de suite.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": [
+        {
+          "id": "m-general-04-r1",
+          "created_at": "2026-08-10T09:50:00+00:00",
+          "updated_at": null,
+          "user": {
+            "id": "u-sophie",
+            "username": "sophie",
+            "first_name": "Sophie",
+            "last_name": "Bernard",
+            "nickname": "",
+            "email": "sophie.bernard@example.fr"
+          },
+          "message": "Parfait, merci !",
+          "reactions": [],
+          "files": [],
+          "links": [],
+          "thread": []
+        }
+      ]
+    },
+    {
+      "id": "m-general-05",
+      "created_at": "2026-08-11T14:10:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Petit compte-rendu de la réunion client de ce matin :\n- Le périmètre du lot 2 est validé\n- La prochaine démo est prévue le 28 août\n- Ils demandent un export CSV en plus du PDF",
+      "reactions": [],
+      "files": [],
+      "links": [
+        {
+          "type": "opengraph",
+          "url": "https://exemple.fr/compte-rendu-reunion",
+          "title": "Compte-rendu réunion client — 11 août",
+          "description": "Notes partagées de la réunion du matin"
+        }
+      ],
+      "thread": []
+    },
+    {
+      "id": "m-general-06",
+      "created_at": "2026-08-11T14:15:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Merci Julien, je note ça dans le backlog. On en reparle en rétro ?",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-07",
+      "created_at": "2026-08-12T11:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Voici la photo de l'équipe prise lors du séminaire de vendredi 📸",
+      "reactions": [
+        {
+          "emoji": "tada",
+          "count": 4,
+          "users": [
+            "camille",
+            "julien",
+            "nabil",
+            "sophie"
+          ]
+        }
+      ],
+      "files": [
+        {
+          "id": "e5f6a7b8",
+          "name": "photo-equipe.svg",
+          "mime_type": "image/svg+xml",
+          "size": 4200,
+          "local_path": "e5f6a7b8_photo-equipe.svg"
+        }
+      ],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-08",
+      "created_at": "2026-08-12T11:05:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Super photo, merci Sophie !",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-09",
+      "created_at": "2026-08-13T16:20:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "> On en reparle en rétro ?\n\nOui, j'ajoute le point à l'ordre du jour de jeudi.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-general-10",
+      "created_at": "2026-08-14T09:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Bon week-end à toutes et tous, à lundi !",
+      "reactions": [
+        {
+          "emoji": "wave",
+          "count": 3,
+          "users": [
+            "camille",
+            "sophie",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    }
+  ]
+}

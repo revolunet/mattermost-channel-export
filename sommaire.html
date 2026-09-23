@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archives Mattermost</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1e1f22;
+  --bg2: #2b2d31;
+  --bg3: #313338;
+  --surface: #383a40;
+  --border: #3f4147;
+  --text: #dbdee1;
+  --text-muted: #80848e;
+  --text-link: #00a8fc;
+  --accent: #5865f2;
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.layout { display: flex; height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sidebar-bottom { margin-top: auto; }
+.sidebar-bottom-row { display: flex; gap: 8px; }
+.sidebar-bottom-row .btn { flex: 1; }
+
+.sidebar h1 { font-size: 17px; font-weight: 800; }
+.sidebar .subtitle { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  width: 100%;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.btn.secondary:hover { background: var(--bg3); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+#status { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 16px; }
+
+.warning {
+  background: #3a2a1a;
+  border: 1px solid #a06a2a;
+  color: #f2c98a;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* Channel list */
+#channels-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.channels-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.channel-item:hover { background: var(--bg3); }
+.channel-item.active { background: var(--surface); border-color: var(--accent); }
+.channel-item .info { min-width: 0; }
+.channel-item .name {
+  font-weight: 600;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.channel-item .name::before { content: "# "; color: var(--text-muted); font-weight: 400; }
+.channel-item .meta { font-size: 11px; color: var(--text-muted); }
+.channel-item .no-html { font-size: 10px; color: #f2c98a; }
+
+a.btn { text-decoration: none; }
+label.btn input { display: none; }
+
+.item-open-btn {
+  text-decoration: none;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+.item-open-btn:hover { color: var(--text); background: var(--bg2); }
+
+/* Search modal */
+dialog#search-modal {
+  margin: auto; /* the global margin reset above also strips native dialog centering */
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: min(480px, 90vw);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+dialog#search-modal::backdrop { background: rgba(0, 0, 0, .6); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.modal-header h2 { font-size: 16px; }
+
+.icon-x {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.icon-x:hover { color: var(--text); }
+
+.search-row { display: flex; flex-direction: column; gap: 10px; }
+.search-row .btn { width: 100%; }
+.search-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font);
+  outline: none;
+}
+.search-input:focus { border-color: var(--accent); }
+
+.search-result {
+  margin-top: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.search-result .excerpt { color: var(--text-muted); font-size: 12px; margin: 4px 0 8px; }
+.search-result.empty { color: var(--text-muted); }
+
+/* Main */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#preview-open-tab { width: auto; }
+
+.preview-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  padding: 20px;
+}
+
+.onboarding {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.onboarding-content {
+  max-width: 760px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+}
+.onboarding-content h2 { font-size: 20px; margin-bottom: 16px; }
+.onboarding-content p { color: var(--text); margin-bottom: 12px; }
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.onboarding-content code {
+  background: var(--surface);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.onboarding-content .btn { width: auto; }
+.onboarding-content .tree {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  overflow-x: auto;
+  margin-bottom: 18px;
+}
+.onboarding-content a { color: var(--text-link); text-decoration: none; }
+.onboarding-content a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .onboarding-grid { grid-template-columns: 1fr; }
+}
+
+#preview-note { margin-top: 0; }
+
+#preview-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar" class="sidebar hidden">
+    <div>
+      <h1>Archives Mattermost</h1>
+      <div class="subtitle">Parcourez vos salons exportés, sans serveur.</div>
+    </div>
+
+    <div id="channels-section">
+      <div class="section-title">Salons</div>
+      <div id="channels-list" class="channels-list"></div>
+    </div>
+
+    <div class="sidebar-bottom-row sidebar-bottom">
+      <button id="search-toggle" class="btn secondary">🔎 Rechercher</button>
+      <label class="btn secondary">📁 Changer<input type="file" class="folder-input" webkitdirectory></label>
+    </div>
+  </aside>
+
+  <dialog id="search-modal">
+    <div class="modal-header">
+      <h2>Rechercher un message</h2>
+      <button id="search-close" class="icon-x" aria-label="Fermer">✕</button>
+    </div>
+    <div class="search-row">
+      <input id="search-input" class="search-input" type="text" placeholder="Lien Mattermost ou ID de message">
+      <button id="search-btn" class="btn secondary">OK</button>
+    </div>
+    <div id="search-result"></div>
+  </dialog>
+
+  <main class="main">
+    <div id="onboarding" class="onboarding">
+      <div class="onboarding-content">
+        <h2>Parcourir des archives Mattermost</h2>
+        <div class="onboarding-grid">
+          <div>
+            <p>Cette page permet d'explorer des archives de salons Mattermost exportées via <a href="https://github.com/revolunet/mattermost-channel-export" target="_blank" rel="noopener">l’outil mattermost-channel-export ↗</a>.</p>
+            <p>1. Décompressez les zips de vos salons dans un même dossier, à côté de cette page (<code>sommaire.html</code>).</p>
+            <p>2. Cliquez sur le bouton ci-dessous et choisissez ce dossier.</p>
+            <p>Votre navigateur peut parler d'« importer » les fichiers : <b>rien n'est envoyé</b>, tout reste sur votre ordinateur.</p>
+            <label class="btn">📁 Choisir le dossier des archives<input type="file" class="folder-input" webkitdirectory></label>
+            <div id="status"></div>
+            <div id="warning" class="warning hidden"></div>
+          </div>
+          <div>
+            <p>exemple de dossier :</p>
+            <pre class="tree">mes-archives/
+├── sommaire.html   ← cette page
+├── general/
+│   ├── general.json
+│   ├── index.html
+│   └── e5f6a7b8_photo-equipe.svg
+└── cantine/
+    ├── cantine.json
+    ├── index.html
+    └── c3d4e5f6_menu-du-jour.svg</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="preview-header" class="preview-header hidden">
+      <h2 id="preview-title"></h2>
+      <a id="preview-open-tab" class="btn secondary" target="_blank" rel="noopener">Ouvrir dans un nouvel onglet ↗</a>
+    </div>
+    <div id="preview-note" class="warning hidden"></div>
+    <div id="preview-empty" class="preview-empty hidden"></div>
+    <iframe id="preview-frame" title="Aperçu du salon" class="hidden"></iframe>
+  </main>
+</div>
+
+<!-- Optional list of channels, used instead of the folder picker when present
+     (the published demo generates one for examples/). -->
+<script src="salons.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // Everything here runs from file://: the folder picker only gives this page
+  // the JSON files to read (channel list, search index), while each channel's
+  // index.html is shown through a plain relative link. That only works when
+  // this page sits in the picked folder, next to the channel folders.
+
+  let channels = [];
+  const messagesById = new Map();
+
+  const $ = (id) => document.getElementById(id);
+  const sidebar = $("sidebar");
+  const channelsList = $("channels-list");
+  const statusEl = $("status");
+  const warningEl = $("warning");
+  const onboarding = $("onboarding");
+  const previewHeader = $("preview-header");
+  const previewTitle = $("preview-title");
+  const previewOpenTab = $("preview-open-tab");
+  const previewEmpty = $("preview-empty");
+  const previewNote = $("preview-note");
+  const previewFrame = $("preview-frame");
+  const searchModal = $("search-modal");
+  const searchInput = $("search-input");
+  const searchResult = $("search-result");
+
+  const ownName = decodeURIComponent(location.pathname.split("/").pop()) || "sommaire.html";
+
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function channelTitle(ch) {
+    const c = ch.data.channel || {};
+    return c.display_name || c.name || ch.dir;
+  }
+
+  function channelUrl(ch, messageId) {
+    return encodeURIComponent(ch.dir) + "/index.html" + (messageId ? "#msg-" + encodeURIComponent(messageId) : "");
+  }
+
+  function isValidExportShape(data) {
+    return !!(data && typeof data === "object" && data.channel && Array.isArray(data.messages));
+  }
+
+  // webkitRelativePath is "<picked folder>/<channel dir>/<file>"; only the
+  // channel dirs right under the picked folder are considered.
+  async function loadFromFiles(files) {
+    const dirs = new Map();
+    let pageInFolder = false;
+    for (const f of files) {
+      const parts = f.webkitRelativePath.split("/");
+      if (parts.length === 2 && parts[1] === ownName) pageInFolder = true;
+      if (parts.length !== 3) continue;
+      const [, dir, name] = parts;
+      if (!dirs.has(dir)) dirs.set(dir, { jsons: [], html: null });
+      const entry = dirs.get(dir);
+      if (name === "index.html") entry.html = f;
+      else if (name.toLowerCase().endsWith(".json")) entry.jsons.push(f);
+    }
+
+    const loaded = [];
+    for (const [dir, entry] of dirs) {
+      const json = entry.jsons.find((f) => f.name === dir + ".json") || entry.jsons[0];
+      if (!json) continue;
+      try {
+        const data = JSON.parse(await json.text());
+        if (isValidExportShape(data)) loaded.push({ dir, data, hasHtml: !!entry.html, htmlFile: entry.html });
+      } catch (e) {
+        console.warn("JSON illisible :", json.webkitRelativePath, e);
+      }
+    }
+
+    warningEl.classList.toggle("hidden", pageInFolder || loaded.length === 0);
+    warningEl.textContent = "Cette page (" + ownName + ") n'est pas dans le dossier choisi : " +
+      "les salons ne pourront pas s'afficher. Placez-la dans le dossier où vous avez décompressé les zips, puis choisissez ce dossier.";
+    setChannels(pageInFolder ? loaded : []);
+    statusEl.textContent = loaded.length ? "" : "Aucun salon exporté trouvé dans ce dossier.";
+  }
+
+  function setChannels(list) {
+    channels = list.sort((a, b) => channelTitle(a).localeCompare(channelTitle(b), "fr"));
+    messagesById.clear();
+    for (const ch of channels) {
+      for (const m of ch.data.messages) {
+        messagesById.set(m.id, { ch, msg: m, isReply: false });
+        for (const r of m.thread || []) messagesById.set(r.id, { ch, msg: r, isReply: true, parent: m });
+      }
+    }
+    renderChannels();
+    const connected = channels.length > 0;
+    onboarding.classList.toggle("hidden", connected);
+    sidebar.classList.toggle("hidden", !connected);
+    previewHeader.classList.add("hidden");
+    previewFrame.classList.add("hidden");
+    previewFrame.removeAttribute("src");
+    previewEmpty.textContent = "Choisissez un salon dans la barre latérale pour l'afficher ici.";
+    previewEmpty.classList.toggle("hidden", !connected);
+  }
+
+  function dateRange(ch) {
+    const dates = ch.data.messages.map((m) => m.created_at).filter(Boolean).sort();
+    if (!dates.length) return "";
+    const first = formatDate(dates[0]);
+    const last = formatDate(dates[dates.length - 1]);
+    return first === last ? first : first + " – " + last;
+  }
+
+  function renderChannels() {
+    channelsList.replaceChildren();
+    for (const ch of channels) {
+      const item = el("div", "channel-item");
+      ch.item = item;
+      const info = el("div", "info");
+      info.append(el("div", "name", channelTitle(ch)));
+      const range = dateRange(ch);
+      info.append(el("div", "meta", ch.data.messages.length + " messages" + (range ? " · " + range : "")));
+      if (!ch.hasHtml) info.append(el("div", "no-html", "pas d'index.html"));
+      item.append(info);
+
+      if (ch.hasHtml) {
+        const open = el("a", "item-open-btn", "↗");
+        open.href = channelUrl(ch);
+        open.target = "_blank";
+        open.rel = "noopener";
+        open.title = "Ouvrir dans un nouvel onglet";
+        open.addEventListener("click", (e) => e.stopPropagation());
+        item.append(open);
+      }
+
+      item.addEventListener("click", () => showChannel(ch));
+      channelsList.append(item);
+    }
+  }
+
+  // Exports rendered before to_html.py handled #msg-<id> anchors lack the
+  // JS that opens a collapsed thread and centres the message, and have no
+  // id on thread replies. Spotted by that JS missing from their index.html
+  // (channels listed by salons.js are always recent).
+  async function isRecentExport(ch) {
+    if (!ch.htmlFile) return true;
+    if (ch.recent === undefined) ch.recent = (await ch.htmlFile.text()).includes("focusFromHash");
+    return ch.recent;
+  }
+
+  // In those, the browser's own jump puts the message at the very top,
+  // under the page's sticky search bar: aim two messages earlier instead.
+  function anchorAbove(ch, id) {
+    const i = ch.data.messages.findIndex((m) => m.id === id);
+    return i >= 2 ? ch.data.messages[i - 2].id : null;
+  }
+
+  // As to_html.py prints it: the export's own time zone, not the viewer's.
+  function describe(msg) {
+    const author = msg.user && msg.user.username;
+    return (author ? "de @" + author + " " : "") + "(" + formatDate(msg.created_at) + ", " + (msg.created_at || "").slice(11, 16) + ")";
+  }
+
+  function showChannel(ch, messageId, note) {
+    previewNote.textContent = note || "";
+    previewNote.classList.toggle("hidden", !note);
+    for (const c of channels) c.item.classList.toggle("active", c === ch);
+    previewTitle.textContent = channelTitle(ch);
+    previewHeader.classList.remove("hidden");
+    if (!ch.hasHtml) {
+      previewFrame.classList.add("hidden");
+      previewOpenTab.classList.add("hidden");
+      previewEmpty.textContent = "index.html manquant pour ce salon — lancez to_html.py dessus.";
+      previewEmpty.classList.remove("hidden");
+      return;
+    }
+    const url = channelUrl(ch, messageId);
+    previewOpenTab.href = url;
+    previewOpenTab.classList.remove("hidden");
+    previewEmpty.classList.add("hidden");
+    previewFrame.classList.remove("hidden");
+    previewFrame.src = url;
+  }
+
+  function extractPostId(raw) {
+    const value = (raw || "").trim();
+    const plMatch = value.match(/\/pl\/([A-Za-z0-9]+)/);
+    if (plMatch) return plMatch[1];
+    if (/^[A-Za-z0-9]{20,32}$/.test(value)) return value;
+    return null;
+  }
+
+  function runSearch() {
+    const postId = extractPostId(searchInput.value);
+    const box = el("div", "search-result");
+    searchResult.replaceChildren(box);
+    if (!postId) {
+      box.classList.add("empty");
+      box.textContent = "Collez un lien Mattermost de la forme https://…/pl/<id>, ou un ID de message.";
+      return;
+    }
+    const found = messagesById.get(postId);
+    if (!found) {
+      box.classList.add("empty");
+      box.textContent = "Aucun message trouvé pour cet ID parmi les " + channels.length + " salon(s) chargé(s).";
+      return;
+    }
+
+    const { ch, msg, isReply, parent } = found;
+    const author = msg.user && msg.user.username;
+    const text = msg.message || "";
+    const head = el("div");
+    head.append(el("strong", null, channelTitle(ch)));
+    head.append(
+      (author ? " · @" + author : "") +
+      (msg.created_at ? " · " + formatDate(msg.created_at) : "") +
+      (isReply ? " · réponse de thread" : "")
+    );
+    box.append(head, el("div", "excerpt", text.length > 160 ? text.slice(0, 160) + "…" : text || "(message vide)"));
+
+    const go = el("button", "btn secondary", "Voir le message");
+    go.disabled = !ch.hasHtml;
+    go.addEventListener("click", async () => {
+      searchModal.close();
+      if (await isRecentExport(ch)) {
+        showChannel(ch, msg.id);
+        return;
+      }
+      const target = isReply ? parent : msg;
+      showChannel(ch, anchorAbove(ch, target.id),
+        "Ce salon a été exporté avec une ancienne version de l'outil : " + (isReply
+          ? "la réponse recherchée " + describe(msg) + " est dans le thread du message " + describe(parent) + ". Dépliez ce thread pour la voir."
+          : "le message recherché est celui " + describe(msg) + "."));
+    });
+    box.append(go);
+  }
+
+  for (const input of document.querySelectorAll(".folder-input")) {
+    input.addEventListener("change", () => {
+      statusEl.textContent = "Lecture du dossier…";
+      loadFromFiles([...input.files]);
+      input.value = "";
+    });
+  }
+
+  $("search-toggle").addEventListener("click", () => {
+    searchModal.showModal();
+    searchInput.focus();
+  });
+  $("search-close").addEventListener("click", () => searchModal.close());
+  searchModal.addEventListener("click", (e) => {
+    if (e.target === searchModal) searchModal.close(); // backdrop click
+  });
+  $("search-btn").addEventListener("click", runSearch);
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      runSearch();
+    }
+  });
+
+  if (Array.isArray(window.SALONS)) {
+    setChannels(window.SALONS.filter((s) => isValidExportShape(s.data)).map((s) => ({ dir: s.dir, data: s.data, hasHtml: true })));
+  }
+})();
+</script>
+</body>
+</html>

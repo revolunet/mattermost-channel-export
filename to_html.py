@@ -203,7 +203,7 @@ def render_thread(replies: list[dict]) -> str:
     for msg in replies:
         user = msg.get("user", {})
         items.append(
-            f'<div class="reply">'
+            f'<div class="reply" id="msg-{html.escape(msg.get("id",""))}">'
             f'{render_avatar(user, "sm")}'
             f'<div class="reply-body">'
             f'<span class="reply-author">{html.escape(display_name(user))}</span>'
@@ -527,6 +527,8 @@ tr:nth-child(even) td { background: var(--bg2); }
 .search-input::placeholder { color: var(--text-muted); }
 #search-count { font-size: 12px; color: var(--text-muted); padding: 0 2px 10px; min-height: 20px; }
 .highlight { background: #faa61a55; border-radius: 2px; }
+.message, .reply { transition: background-color .4s ease; }
+.focused { background-color: rgba(250,166,26,.35); }
 
 /* Footer */
 .footer { font-size: 11px; color: var(--text-muted); text-align: center; padding: 24px 0 12px; border-top: 1px solid var(--border); margin-top: 24px; }
@@ -543,6 +545,21 @@ function toggleThread(btn) {
   const replies = btn.nextElementSibling;
   replies.classList.toggle('hidden');
 }
+
+// Links like index.html#msg-<id> (e.g. from sommaire.html) scroll to the
+// message, opening its thread first if it is a collapsed reply.
+function focusFromHash() {
+  const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (!el) return;
+  const replies = el.closest('.thread-replies');
+  if (replies && replies.classList.contains('hidden')) toggleThread(replies.previousElementSibling);
+  el.scrollIntoView({ block: 'center' });
+  el.classList.add('focused');
+  setTimeout(function() { el.classList.remove('focused'); }, 2200);
+}
+window.addEventListener('hashchange', focusFromHash);
+// After load, so the browser's own jump to the anchor doesn't override ours.
+window.addEventListener('load', focusFromHash);
 
 (function() {
   const input = document.getElementById('search-input');

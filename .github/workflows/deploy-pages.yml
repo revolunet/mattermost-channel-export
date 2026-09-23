@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+      - run: uv sync
+      - name: Render examples/*/index.html
+        run: |
+          for f in examples/*/*.json; do
+            uv run to_html.py "$f" "$(dirname "$f")/index.html"
+          done
+      - name: Assemble Pages site
+        run: |
+          mkdir -p _site
+          # Landing page, with the files it offers for download
+          cp site/index.html docs/browser-screenshot-room.png sommaire.html _site/
+          mkdir -p _zip/archives-exemple
+          cp sommaire.html _zip/archives-exemple/
+          cp -r examples/* _zip/archives-exemple/
+          (cd _zip && python3 -m zipfile -c ../_site/archives-exemple.zip archives-exemple)
+          # Online demo: sommaire.html over examples/, with a generated salons.js
+          # standing in for the folder picker, which can't point at a server's folder
+          cp -r examples _site/examples
+          cp sommaire.html _site/examples/index.html
+          uv run python -c 'import json, pathlib; print("window.SALONS = " + json.dumps([{"dir": p.parent.name, "data": json.loads(p.read_text())} for p in sorted(pathlib.Path("examples").glob("*/*.json"))], ensure_ascii=False) + ";")' > _site/examples/salons.js
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

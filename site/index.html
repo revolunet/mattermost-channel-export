@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archives Mattermost</title>
+<meta name="description" content="Exporter des salons Mattermost en archives HTML lisibles hors ligne, et les parcourir avec une simple page.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1e1f22;
+  --bg2: #2b2d31;
+  --surface: #383a40;
+  --border: #3f4147;
+  --text: #dbdee1;
+  --text-muted: #949ba4;
+  --text-link: #00a8fc;
+  --accent: #5865f2;
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page { max-width: 960px; margin: 0 auto; padding: 56px 16px 40px; }
+
+header { margin-bottom: 40px; }
+header h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; line-height: 1.2; }
+header p { color: var(--text-muted); font-size: 18px; margin-top: 12px; max-width: 680px; }
+
+.screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 48px;
+}
+
+section { margin-bottom: 48px; }
+h2 { font-size: 22px; margin-bottom: 16px; }
+p { margin-bottom: 12px; }
+a { color: var(--text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  background: var(--surface);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card h3 { font-size: 16px; margin-bottom: 8px; }
+.card p { color: var(--text-muted); font-size: 14.5px; margin-bottom: 0; }
+.card .num { color: var(--accent); font-weight: 800; margin-right: 6px; }
+
+.downloads { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.downloads .card { display: flex; flex-direction: column; gap: 12px; }
+.downloads .card p { margin: 0; }
+.downloads ol { color: var(--text-muted); font-size: 14.5px; padding-left: 20px; }
+.downloads .actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.btn:hover { filter: brightness(1.1); text-decoration: none; }
+.btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+.tree {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.note { color: var(--text-muted); font-size: 14.5px; }
+
+footer { border-top: 1px solid var(--border); padding-top: 20px; color: var(--text-muted); font-size: 14px; }
+
+@media (max-width: 760px) {
+  .steps, .downloads { grid-template-columns: 1fr; }
+  .page { padding-top: 32px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Archives Mattermost</h1>
+    <p>Conservez l'historique de vos salons Mattermost sous forme de pages web lisibles hors ligne, et retrouvez n'importe quel message à partir de son lien.</p>
+  </header>
+
+  <img class="screenshot" src="browser-screenshot-room.png" width="1215" height="600" alt="La page sommaire.html : la liste des salons à gauche, le salon Général affiché à droite.">
+
+  <section>
+    <h2>Comment ça marche</h2>
+    <div class="steps">
+      <div class="card">
+        <h3><span class="num">1</span>Exporter</h3>
+        <p>Un administrateur exporte les salons via l'API Mattermost : messages, threads, réactions, liens et images.</p>
+      </div>
+      <div class="card">
+        <h3><span class="num">2</span>Mettre en page</h3>
+        <p>Chaque salon devient un dossier avec une page <code>index.html</code> autonome, consultable sans connexion.</p>
+      </div>
+      <div class="card">
+        <h3><span class="num">3</span>Parcourir</h3>
+        <p>La page <code>sommaire.html</code> réunit tous vos salons, et retrouve un message à partir de son lien Mattermost.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Télécharger</h2>
+    <div class="downloads">
+      <div class="card">
+        <h3>Vous avez reçu des salons exportés</h3>
+        <ol>
+          <li>Décompressez les zips de vos salons dans un même dossier.</li>
+          <li>Enregistrez <code>sommaire.html</code> dans ce dossier.</li>
+          <li>Ouvrez-le d'un double-clic, puis choisissez ce dossier.</li>
+        </ol>
+        <pre class="tree">mes-archives/
+├── sommaire.html
+├── general/
+└── cantine/</pre>
+        <div class="actions">
+          <a class="btn" href="sommaire.html" download>⬇ Télécharger sommaire.html</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Vous voulez essayer</h3>
+        <p class="note">Un zip d'exemple avec <code>sommaire.html</code> et trois salons fictifs déjà exportés : Général, Cantine et Veille technique.</p>
+        <ol>
+          <li>Décompressez le zip.</li>
+          <li>Ouvrez <code>sommaire.html</code> dans le dossier obtenu.</li>
+          <li>Choisissez ce même dossier.</li>
+        </ol>
+        <div class="actions">
+          <a class="btn" href="archives-exemple.zip" download>⬇ Télécharger l'exemple</a>
+          <a class="btn secondary" href="examples/">Voir en ligne ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Vos données restent chez vous</h2>
+    <p class="note">Les archives s'ouvrent directement depuis votre ordinateur, sans serveur ni compte, dans n'importe quel navigateur récent.
+      Votre navigateur peut parler d'« importer » les fichiers au moment de choisir le dossier : rien n'est envoyé, la page ne fait que les lire.</p>
+  </section>
+
+  <section>
+    <h2>Pour exporter des salons</h2>
+    <p class="note">L'export se fait avec des scripts Python et un jeton d'accès Mattermost.
+      Toutes les instructions sont dans le <a href="https://github.com/revolunet/mattermost-channel-export">dépôt GitHub du projet</a>.</p>
+  </section>
+
+  <footer>
+    <a href="https://github.com/revolunet/mattermost-channel-export">mattermost-channel-export</a>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,6 +1,14 @@
 # mattermost-channel-export
 
-Three scripts to select, export a Mattermost channel history, and render it as a static HTML archive.
+Three scripts to select, export a Mattermost channel messages and images, and render it as an HTML archive.
+
+There is also `sommaire.html`, a single page to browse several exported channels at once.
+
+![exports browser screenshot](docs/browser-screenshot-room.png)
+
+- [Project website](https://revolunet.github.io/mattermost-channel-export/): overview, `sommaire.html` and an example archive to download
+- [`sommaire.html` demo over the example channels](https://revolunet.github.io/mattermost-channel-export/examples/)
+- [standalone HTML export example](https://revolunet.github.io/mattermost-channel-export/examples/cantine/index.html)
 
 Tested against Mattermost **10.12.4**.
 
@@ -95,67 +103,7 @@ Re-running `export.py` is safe and cheap: images already present on disk
 
 ### Output format
 
-```json
-{
-  "exported_at": "2026-04-21T10:00:00+00:00",
-  "channel": {
-    "id": "...",
-    "name": "general",
-    "display_name": "General",
-    "type": "O",
-    "purpose": "...",
-    "team": "Acme Corp",
-    "created_at": "..."
-  },
-  "message_count": 1234,
-  "messages": [
-    {
-      "id": "...",
-      "created_at": "2026-01-15T09:32:00+00:00",
-      "updated_at": null,
-      "user": {
-        "id": "...",
-        "username": "alice",
-        "first_name": "Alice",
-        "last_name": "Smith",
-        "nickname": "",
-        "email": "alice@example.com"
-      },
-      "message": "Hello everyone! :wave:",
-      "reactions": [
-        { "emoji": "thumbsup", "count": 3, "users": ["bob", "carol", "dave"] }
-      ],
-      "files": [
-        {
-          "id": "...",
-          "name": "report.pdf",
-          "mime_type": "application/pdf",
-          "size": 48320
-        },
-        {
-          "id": "...",
-          "name": "screenshot.png",
-          "mime_type": "image/png",
-          "size": 310647,
-          "local_path": "abc123_screenshot.png"
-        }
-      ],
-      "links": [{ "type": "opengraph", "url": "https://...", "title": "..." }],
-      "thread": [
-        {
-          "id": "...",
-          "created_at": "...",
-          "user": { "username": "bob", "...": "..." },
-          "message": "Great!",
-          "reactions": [],
-          "files": [],
-          "links": []
-        }
-      ]
-    }
-  ]
-}
-```
+Voir `examples/general/general.json` pour un exemple complet de sortie (canal, messages, réactions, fichiers, threads).
 
 ## Render a proper HTML page with a channel's history — `to_html.py`
 
@@ -184,3 +132,40 @@ uv run --env-file .env to_html.py
 - Live search bar — filters messages and highlights matches in real-time
 - Zebra-striped, horizontally-scrollable tables
 
+---
+
+## Browse multiple exported channels — `sommaire.html`
+
+A single static, dependency-free page for browsing several exported channels at once, meant for non-technical users: no script to run, no server, any browser.
+
+1. Unzip each exported channel into the same folder, and put `sommaire.html` next to them.
+2. Double-click `sommaire.html`, click the button and pick that same folder.
+
+```
+my-archives/
+├── sommaire.html
+├── general/
+│   ├── general.json
+│   ├── index.html
+│   └── e5f6a7b8_photo-equipe.svg
+└── cantine/
+    └── …
+```
+
+The page only reads the channels' JSON files, to list the channels and build a search index.
+Each channel is then shown through a plain relative link to its `index.html`, which is why the page must sit in the picked folder.
+Nothing is remembered between visits: the folder has to be picked again each time.
+
+There is a search feature that accepts a Mattermost permalink (`https://…/pl/<id>`) or a raw message ID and opens the right channel at that message (`<channel>/index.html#msg-<id>`, which also works on its own).
+Exports rendered before `to_html.py` handled that anchor work too: `sommaire.html` scrolls to the message, or to its thread's parent message, and says which one to look at (and which thread to expand).
+
+Security-wise, everything runs from `file://`, where browsers isolate each file from the others: a channel page, or an image in it, can't reach the other files or this page.
+
+### Demo
+
+- **Project website**: https://revolunet.github.io/mattermost-channel-export/ — built from `site/index.html`, offers `sommaire.html` and `archives-exemple.zip` (`sommaire.html` + the example channels) for download.
+- **Channels browser**: https://revolunet.github.io/mattermost-channel-export/examples/ — the example channels, listed from a `salons.js` generated at deploy time (used instead of the folder picker when present).
+- **Individual example channel pages** (rendered by `to_html.py`, published as-is):
+  - https://revolunet.github.io/mattermost-channel-export/examples/general/index.html
+  - https://revolunet.github.io/mattermost-channel-export/examples/cantine/index.html
+  - https://revolunet.github.io/mattermost-channel-export/examples/veille-tech/index.html

@@ -1,0 +1,259 @@
+{
+  "exported_at": "2026-08-14T18:00:00+00:00",
+  "channel": {
+    "id": "chan-veille-tech-003",
+    "name": "veille-tech",
+    "display_name": "Veille technique",
+    "type": "O",
+    "purpose": "Partage d'articles et d'outils techniques",
+    "header": "Articles, outils et retours d'expérience techniques",
+    "team": "Équipe Exemple",
+    "created_at": "2026-01-05T08:00:00+00:00"
+  },
+  "message_count": 10,
+  "messages": [
+    {
+      "id": "m-veille-01",
+      "created_at": "2026-08-10T10:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Je viens de tomber sur un article intéressant sur les migrations de bases de données sans downtime, je le partage ici.",
+      "reactions": [],
+      "files": [],
+      "links": [
+        {
+          "type": "opengraph",
+          "url": "https://exemple-tech.fr/articles/migrations-sans-downtime",
+          "title": "Migrer une base de données sans interruption de service",
+          "description": "Un tour d'horizon des techniques de migration progressive"
+        }
+      ],
+      "thread": []
+    },
+    {
+      "id": "m-veille-02",
+      "created_at": "2026-08-10T10:05:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Merci, ça tombe bien je cherchais justement de la doc sur le sujet pour le projet lot 2.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-03",
+      "created_at": "2026-08-10T14:20:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Petit retour d'expérience sur `pytest-benchmark` que j'ai testé cette semaine :\n\n```python\ndef test_ma_fonction(benchmark):\n    benchmark(ma_fonction, 42)\n```\n\nTrès simple à mettre en place et les résultats sont clairs.",
+      "reactions": [
+        {
+          "emoji": "tada",
+          "count": 2,
+          "users": [
+            "julien",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-04",
+      "created_at": "2026-08-11T09:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Vous avez vu la dernière version de PostgreSQL ? Le nouvel optimiseur de requêtes a l'air prometteur.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": [
+        {
+          "id": "m-veille-04-r1",
+          "created_at": "2026-08-11T09:10:00+00:00",
+          "updated_at": null,
+          "user": {
+            "id": "u-julien",
+            "username": "julien",
+            "first_name": "Julien",
+            "last_name": "Martin",
+            "nickname": "",
+            "email": "julien.martin@example.fr"
+          },
+          "message": "Oui j'ai vu ça passer, faudrait qu'on teste sur notre base de préprod.",
+          "reactions": [],
+          "files": [],
+          "links": [],
+          "thread": []
+        }
+      ]
+    },
+    {
+      "id": "m-veille-05",
+      "created_at": "2026-08-11T15:30:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "J'ai fait un petit schéma de l'architecture actuelle pour la présentation de jeudi, dites-moi si ça vous semble juste.",
+      "reactions": [],
+      "files": [
+        {
+          "id": "a1b2c3d4",
+          "name": "schema-archi.svg",
+          "mime_type": "image/svg+xml",
+          "size": 4100,
+          "local_path": "a1b2c3d4_schema-archi.svg"
+        }
+      ],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-06",
+      "created_at": "2026-08-11T15:35:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Ça correspond à ce que j'ai en tête, merci Camille !",
+      "reactions": [
+        {
+          "emoji": "thumbsup",
+          "count": 3,
+          "users": [
+            "camille",
+            "julien",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-07",
+      "created_at": "2026-08-12T11:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "> Le nouvel optimiseur de requêtes a l'air prometteur\n\nJ'ai lancé quelques benchmarks, les gains sont réels sur les jointures complexes.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-08",
+      "created_at": "2026-08-13T09:40:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Question ouverte : est-ce que quelqu'un a déjà utilisé `ruff` en remplacement de flake8 + black sur un gros projet ?",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-09",
+      "created_at": "2026-08-13T09:45:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Oui, on l'utilise depuis 6 mois sur un autre projet, c'est beaucoup plus rapide et ça remplace plusieurs outils d'un coup.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-veille-10",
+      "created_at": "2026-08-14T10:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Pour info, mini atelier veille technique vendredi à 11h si ça intéresse du monde, on parlera des retours de la semaine.",
+      "reactions": [
+        {
+          "emoji": "wave",
+          "count": 3,
+          "users": [
+            "julien",
+            "sophie",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    }
+  ]
+}

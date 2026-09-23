@@ -1,0 +1,251 @@
+{
+  "exported_at": "2026-08-14T18:00:00+00:00",
+  "channel": {
+    "id": "chan-cantine-002",
+    "name": "cantine",
+    "display_name": "Cantine",
+    "type": "O",
+    "purpose": "Organisation des repas et pauses café",
+    "header": "Pour tout ce qui touche à la pause déj' et au café ☕",
+    "team": "Équipe Exemple",
+    "created_at": "2026-01-05T08:00:00+00:00"
+  },
+  "message_count": 10,
+  "messages": [
+    {
+      "id": "m-cantine-01",
+      "created_at": "2026-08-10T11:30:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Qui est chaud pour un point resto ce midi ? On teste la nouvelle cantine asiatique rue des Lilas.",
+      "reactions": [
+        {
+          "emoji": "tada",
+          "count": 2,
+          "users": [
+            "camille",
+            "sophie"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-02",
+      "created_at": "2026-08-10T11:32:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Moi je suis partante, 12h30 ça vous va ?",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-03",
+      "created_at": "2026-08-10T11:35:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Ok pour moi, je réserve une table pour 4.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-04",
+      "created_at": "2026-08-10T11:36:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Parfait, à tout à l'heure alors 🍜",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-05",
+      "created_at": "2026-08-11T09:15:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "**Menu de la semaine** à la cantine d'entreprise :\n- Lundi : couscous végétarien\n- Mardi : poulet rôti\n- Mercredi : gratin dauphinois\n- Jeudi : poisson du jour\n- Vendredi : buffet libre",
+      "reactions": [],
+      "files": [
+        {
+          "id": "c3d4e5f6",
+          "name": "menu-du-jour.svg",
+          "mime_type": "image/svg+xml",
+          "size": 3900,
+          "local_path": "c3d4e5f6_menu-du-jour.svg"
+        }
+      ],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-06",
+      "created_at": "2026-08-11T09:20:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Merci pour le partage, je note le mercredi dans mon agenda 😄",
+      "reactions": [
+        {
+          "emoji": "thumbsup",
+          "count": 3,
+          "users": [
+            "camille",
+            "julien",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-07",
+      "created_at": "2026-08-12T12:00:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-camille",
+        "username": "camille",
+        "first_name": "Camille",
+        "last_name": "Dubois",
+        "nickname": "",
+        "email": "camille.dubois@example.fr"
+      },
+      "message": "Quelqu'un a une machine à café qui marche au 3e étage ? La nôtre est encore en panne.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": [
+        {
+          "id": "m-cantine-07-r1",
+          "created_at": "2026-08-12T12:05:00+00:00",
+          "updated_at": null,
+          "user": {
+            "id": "u-julien",
+            "username": "julien",
+            "first_name": "Julien",
+            "last_name": "Martin",
+            "nickname": "",
+            "email": "julien.martin@example.fr"
+          },
+          "message": "Oui, utilise celle du 2e en attendant, le mainteneur passe demain.",
+          "reactions": [],
+          "files": [],
+          "links": [],
+          "thread": []
+        }
+      ]
+    },
+    {
+      "id": "m-cantine-08",
+      "created_at": "2026-08-13T08:50:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-nabil",
+        "username": "nabil",
+        "first_name": "Nabil",
+        "last_name": "Haddad",
+        "nickname": "",
+        "email": "nabil.haddad@example.fr"
+      },
+      "message": "Pensez à ramener vos couverts, la cantine ne fournit plus de jetables à partir de la semaine prochaine (mesure anti-gaspillage).",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-09",
+      "created_at": "2026-08-13T08:55:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-julien",
+        "username": "julien",
+        "first_name": "Julien",
+        "last_name": "Martin",
+        "nickname": "",
+        "email": "julien.martin@example.fr"
+      },
+      "message": "Bonne initiative, je pense que tout le monde peut s'organiser avec ça.",
+      "reactions": [],
+      "files": [],
+      "links": [],
+      "thread": []
+    },
+    {
+      "id": "m-cantine-10",
+      "created_at": "2026-08-14T12:10:00+00:00",
+      "updated_at": null,
+      "user": {
+        "id": "u-sophie",
+        "username": "sophie",
+        "first_name": "Sophie",
+        "last_name": "Bernard",
+        "nickname": "",
+        "email": "sophie.bernard@example.fr"
+      },
+      "message": "Rappel : la cantine ferme exceptionnellement à 16h vendredi pour cause d'inventaire, pensez à déjeuner un peu plus tôt !",
+      "reactions": [
+        {
+          "emoji": "thumbsup",
+          "count": 2,
+          "users": [
+            "camille",
+            "nabil"
+          ]
+        }
+      ],
+      "files": [],
+      "links": [],
+      "thread": []
+    }
+  ]
+}
