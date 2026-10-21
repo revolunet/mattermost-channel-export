@@ -8,7 +8,7 @@ Useful for uploading to platforms that accept PDF but reject .html files
 
 Unlike the interactive HTML page, thread replies are always expanded
 (there is no click interaction in a static PDF), and the live search box
-is hidden, since it cannot work without JavaScript-driven pagination.
+is hidden, since it cannot work without JavaScript-driven filtering.
 
 Usage:
     uv run to_pdf.py [input.json] [output.pdf]
@@ -18,15 +18,20 @@ Defaults:
     output : index.pdf, written next to the input JSON (so it can embed
              any images export.py downloaded into that same directory)
 
+The input must be a .json file and the output a .pdf file.
+
 Requires a Chrome/Chromium binary on PATH (google-chrome, google-chrome-stable,
-or chromium), used headless to render the page and print it to PDF.
+chromium or chromium-browser), used headless to render the page and print it to PDF.
 """
 
+import copy
 import shutil
 import subprocess
 import sys
 import json
 from pathlib import Path
+
+from PIL import Image, ImageOps
 
 from to_html import build_html
 
@@ -38,6 +43,16 @@ PDF_OVERRIDES_CSS = """
 .thread-toggle { display: none !important; }
 .search-wrap { display: none !important; }
 """
+
+# Chrome embeds images in the PDF at their original resolution: a channel
+# with many full-size phone photos (10+ MB each) makes it run out of memory
+# and crash or hang. Images are therefore downscaled for the PDF only, into
+# a hidden directory next to the originals (which are left untouched).
+PDF_IMAGE_MAX_SIZE = 1600  # px, longest side
+PDF_IMAGE_JPEG_QUALITY = 85
+PDF_IMAGES_DIR = ".pdf-images"
+
+CHROME_TIMEOUT = 30 * 60  # seconds; Chrome can hang instead of crashing on oversized pages
 
 CHROME_CANDIDATES = ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser"]
 
@@ -53,7 +68,53 @@ def find_chrome() -> str:
     )
 
 
+def downscale_image(source: Path, dest_dir: Path) -> Path:
+    """Write a reduced copy of `source` into `dest_dir` (cached), and return its path.
+
+    Animated GIFs keep only their first frame, which is all a PDF can show.
+    Images with transparency stay PNG, everything else becomes JPEG.
+    """
+    with Image.open(source) as img:
+        img = ImageOps.exif_transpose(img)  # phone photos rely on EXIF for orientation
+        has_alpha = img.mode in ("RGBA", "LA", "PA") or (img.mode == "P" and "transparency" in img.info)
+        suffix = ".png" if has_alpha else ".jpg"
+        dest = dest_dir / (source.stem + suffix)
+        if dest.exists() and dest.stat().st_mtime >= source.stat().st_mtime:
+            return dest
+        img.thumbnail((PDF_IMAGE_MAX_SIZE, PDF_IMAGE_MAX_SIZE))
+        if has_alpha:
+            img.convert("RGBA").save(dest, optimize=True)
+        else:
+            img.convert("RGB").save(dest, quality=PDF_IMAGE_JPEG_QUALITY, optimize=True)
+    return dest
+
+
+def with_downscaled_images(data: dict, base_dir: Path) -> dict:
+    """Return a copy of `data` whose images' local_path point to downscaled copies."""
+    data = copy.deepcopy(data)
+    dest_dir = base_dir / PDF_IMAGES_DIR
+    dest_dir.mkdir(exist_ok=True)
+
+    def posts(messages: list[dict]):
+        for message in messages:
+            yield message
+            yield from message.get("thread", [])
+
+    for post in posts(data.get("messages", [])):
+        for f in post.get("files", []):
+            local_path = f.get("local_path")
+            if not local_path or not (base_dir / local_path).exists():
+                continue
+            try:
+                f["local_path"] = downscale_image(base_dir / local_path, dest_dir).relative_to(base_dir).as_posix()
+            except Exception as exc:  # Pillow raises various types (OSError, SyntaxError …)
+                # Unreadable/corrupt image: keep the original reference
+                print(f"  Warning: could not downscale {local_path}: {exc}")
+    return data
+
+
 def render_pdf(data: dict, output_file: Path) -> None:
+    data = with_downscaled_images(data, output_file.parent)
     html_content = build_html(data).replace("</style>", PDF_OVERRIDES_CSS + "</style>", 1)
 
     # Chrome resolves the image src="..." relative paths against the HTML
@@ -72,6 +133,7 @@ def render_pdf(data: dict, output_file: Path) -> None:
                 "--no-sandbox",
                 f"--print-to-pdf={output_file.resolve()}",
                 "--print-to-pdf-no-header",
+                "--no-pdf-header-footer",  # replaces the above in Chrome's new headless mode
                 "--no-margins",
                 "--virtual-time-budget=20000",
                 "--run-all-compositor-stages-before-draw",
@@ -80,17 +142,28 @@ def render_pdf(data: dict, output_file: Path) -> None:
             check=True,
             capture_output=True,
             text=True,
+            timeout=CHROME_TIMEOUT,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(f"ERROR: Chrome failed to render the PDF:\n{exc.stderr}")
+    except subprocess.TimeoutExpired:
+        sys.exit(f"ERROR: Chrome did not render the PDF within {CHROME_TIMEOUT // 60} minutes")
     finally:
         temp_html.unlink(missing_ok=True)
 
 
 def main() -> None:
     args = sys.argv[1:]
+    if len(args) > 2:
+        sys.exit(f"ERROR: too many arguments (expected at most 2, got {len(args)}): {args}")
+
     input_file = Path(args[0]) if args else Path("channel_export.json")
     output_file = Path(args[1]) if len(args) > 1 else input_file.parent / "index.pdf"
+
+    if args and input_file.suffix.lower() != ".json":
+        sys.exit(f"ERROR: input file must have a .json extension, got: {input_file}")
+    if len(args) > 1 and output_file.suffix.lower() != ".pdf":
+        sys.exit(f"ERROR: output file must have a .pdf extension, got: {output_file}")
 
     if not input_file.exists():
         sys.exit(f"ERROR: input file not found: {input_file}")

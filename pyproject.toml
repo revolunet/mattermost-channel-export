@@ -6,4 +6,5 @@ dependencies = [
     "requests",
     "emoji",
     "mistune>=3.3.3",
+    "pillow>=11.3.0",
 ]
