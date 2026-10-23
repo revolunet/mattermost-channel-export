@@ -10,6 +10,8 @@ Defaults:
     input  : channel_export.json
     output : index.html, written next to the input JSON (so it sits alongside
              any images export.py downloaded into that same directory)
+
+The input must be a .json file and the output an .html file.
 """
 
 import html
@@ -698,8 +700,16 @@ def build_html(data: dict) -> str:
 
 def main() -> None:
     args = sys.argv[1:]
+    if len(args) > 2:
+        sys.exit(f"ERROR: too many arguments (expected at most 2, got {len(args)}): {args}")
+
     input_file = Path(args[0]) if args else Path("channel_export.json")
     output_file = Path(args[1]) if len(args) > 1 else input_file.parent / "index.html"
+
+    if args and input_file.suffix.lower() != ".json":
+        sys.exit(f"ERROR: input file must have a .json extension, got: {input_file}")
+    if len(args) > 1 and output_file.suffix.lower() != ".html":
+        sys.exit(f"ERROR: output file must have a .html extension, got: {output_file}")
 
     if not input_file.exists():
         sys.exit(f"ERROR: input file not found: {input_file}")

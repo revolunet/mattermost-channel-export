@@ -1,9 +1,10 @@
 [project]
 name = "mattermost-channel-export"
 version = "0.1.0"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     "requests",
     "emoji",
     "mistune>=3.3.3",
+    "pillow>=13.0.0",
 ]
